@@ -70,6 +70,12 @@ test("API", function() {
             method: true,
             static: true,
             parent: mock
+        },
+        foo: {
+            property: true,
+            parent: myMock,
+            type: 'string',
+            value: 'foo'
         }
     };
 

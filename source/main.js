@@ -27,9 +27,7 @@ qh.msg = {
  */
 qh.api = function(cfg) {
 
-    var args,
-        prop,
-        it;
+    var args, prop, it;
 
     for (prop in cfg) {
 
@@ -37,9 +35,10 @@ qh.api = function(cfg) {
         it = cfg[prop];
         args.push(prop);
 
+        if (it.parent) args.push(it.parent);
+
         if (it.method) {
 
-            if (it.parent) args.push(it.parent);
             if (it.args) args.push(it.args);
 
             if (it.static) this.staticMethod.apply(this, args);
@@ -48,12 +47,10 @@ qh.api = function(cfg) {
         }
 
         if (it.property) {
-            if (it.parent) args.push(it.parent);
-            if (it.args) args.push(it.args);
 
-            if (it.static) this.staticMethod.apply(this, args);
-            else if (it.global) this.globalMethod.apply(this, args);
-            else this.method.apply(this, args);
+
+
+            this.property.apply(this, args);
         }
     }
 };
@@ -64,11 +61,12 @@ qh.api = function(cfg) {
  * @param [object]
  * @returns {*}
  */
-qh.getNameAsString = function(property, object) {
+qh.getName = function(property, object) {
+
     var name = '';
 
     if (object && object.name) name += object.name + '.';
-    else name += property;
+    name += property;
 
     return name;
 };
@@ -84,12 +82,21 @@ qh.getItem = function(property, object) {
 };
 
 /**
+ * "string" to "String" helper
+ * @param str {String}
+ * @returns {string}
+ */
+qh.firstUp = function(str) {
+    return str[0].toUpperCase() + str.substring(1, str.length-1);
+};
+
+/**
  * Check that the tested item is of type "function"
  * @param property
  * @param [object]
  */
 qh.typeFunction = function(property, object) {
-    equal(typeof this.getItem(property, object), 'function', this.getNameAsString(property, object) + qh.msg.isFunction);
+    equal(typeof this.getItem(property, object), 'function', this.getName(property, object) + qh.msg.isFunction);
 };
 
 /**
@@ -98,7 +105,7 @@ qh.typeFunction = function(property, object) {
  * @param [object]
  */
 qh.typeNumber = function(property, object) {
-    equal(typeof this.getItem(property, object), 'number', this.getNameAsString(property, object) + qh.msg.isNumber);
+    equal(typeof this.getItem(property, object), 'number', this.getName(property, object) + qh.msg.isNumber);
 };
 
 /**
@@ -107,7 +114,7 @@ qh.typeNumber = function(property, object) {
  * @param [object]
  */
 qh.typeString = function(property, object) {
-    equal(typeof this.getItem(property, object), 'string', this.getNameAsString(property, object) + qh.msg.isString);
+    equal(typeof this.getItem(property, object), 'string', this.getName(property, object) + qh.msg.isString);
 };
 
 /**
@@ -116,7 +123,7 @@ qh.typeString = function(property, object) {
  * @param [object]
  */
 qh.typeObject = function(property, object) {
-    equal(typeof this.getItem(property, object), 'object', this.getNameAsString(property, object) + qh.msg.isObject);
+    equal(typeof this.getItem(property, object), 'object', this.getName(property, object) + qh.msg.isObject);
 };
 
 /**
@@ -125,7 +132,7 @@ qh.typeObject = function(property, object) {
  * @param [object]
  */
 qh.typeArray = function(property, object) {
-    deepEqual(this.getItem(property, object).constructor, Array, this.getNameAsString(property, object) + qh.msg.isObject);
+    deepEqual(this.getItem(property, object).constructor, Array, this.getName(property, object) + qh.msg.isObject);
 };
 
 /**
@@ -135,9 +142,11 @@ qh.typeArray = function(property, object) {
  * @param [len]
  */
 qh.method = function(method, object, len) {
-    var name = this.getNameAsString(method, object);
+
+    var name = this.getName(method, object);
     var item = this.getItem(method, object);
     len = len || 0;
+
     ok(item, name + qh.msg.exists);
     this.typeFunction(method, object);
     this.argsLength(item, name, len);
@@ -150,9 +159,11 @@ qh.method = function(method, object, len) {
  * @param [len]
  */
 qh.staticMethod = function(method, object, len) {
+
     // TODO handle case where the constructor requires arguments
     var instance = new object();
-    equal(instance[method], undefined, this.getNameAsString(method, object) + qh.msg.isNotInherited);
+
+    equal(instance[method], undefined, this.getName(method, object) + qh.msg.isNotInherited);
     this.method(method, object, len);
 };
 
@@ -173,4 +184,15 @@ qh.globalMethod = function(method, len) {
  */
 qh.argsLength = function(item, name, len) {
     equal(item.length, len, name + qh.msg.argumentsCount + len);
+};
+
+qh.property = function(property, object, type, value) {
+
+    var name = this.getName(property, object);
+    var item = this.getItem(property, object);
+
+    if (type) {
+
+    }
+
 };
