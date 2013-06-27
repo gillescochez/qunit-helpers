@@ -22,13 +22,57 @@ qh.msg = {
 };
 
 /**
+ * Take an object representation of the API and run tests accordingly
+ * @param cfg {Object} API configuration object
+ */
+qh.api = function(cfg) {
+
+    var args,
+        prop,
+        it;
+
+    for (prop in cfg) {
+
+        args = [];
+        it = cfg[prop];
+        args.push(prop);
+
+        console.log(args, it);
+
+        if (it.method) {
+
+            if (it.parent) args.push(it.parent);
+            if (it.args) args.push(it.args);
+
+            if (it.static) this.staticMethod.apply(this, args);
+            else if (it.global) this.globalMethod.apply(this, args);
+            else this.method.apply(this, args);
+        }
+
+//        if (it.property) {
+//            if (it.parent) args.push(it.parent);
+//            if (it.args) args.push(it.args);
+//
+//            if (it.static) this.staticMethod.apply(this, args);
+//            else if (it.global) this.globalMethod.apply(this, args);
+//            else this.method.apply(this, args);
+//        }
+    }
+};
+
+/**
  * Return the name of the method as a string using the parent object name if any.
  * @param property
  * @param [object]
  * @returns {*}
  */
 qh.getNameAsString = function(property, object) {
-    return object ? ((object.name + '.' || "") + property) : property;
+    var name = '';
+
+    if (object && object.name) name += object.name + '.';
+    else name += property;
+
+    return name;
 };
 
 /**
@@ -108,6 +152,7 @@ qh.method = function(method, object, len) {
  * @param [len]
  */
 qh.staticMethod = function(method, object, len) {
+    // TODO handle case where the constructor requires arguments
     var instance = new object();
     equal(instance[method], undefined, this.getNameAsString(method, object) + qh.msg.isNotInherited);
     this.method(method, object, len);
