@@ -37,8 +37,6 @@ qh.api = function(cfg) {
         it = cfg[prop];
         args.push(prop);
 
-        console.log(args, it);
-
         if (it.method) {
 
             if (it.parent) args.push(it.parent);
@@ -49,14 +47,14 @@ qh.api = function(cfg) {
             else this.method.apply(this, args);
         }
 
-//        if (it.property) {
-//            if (it.parent) args.push(it.parent);
-//            if (it.args) args.push(it.args);
-//
-//            if (it.static) this.staticMethod.apply(this, args);
-//            else if (it.global) this.globalMethod.apply(this, args);
-//            else this.method.apply(this, args);
-//        }
+        if (it.property) {
+            if (it.parent) args.push(it.parent);
+            if (it.args) args.push(it.args);
+
+            if (it.static) this.staticMethod.apply(this, args);
+            else if (it.global) this.globalMethod.apply(this, args);
+            else this.method.apply(this, args);
+        }
     }
 };
 
