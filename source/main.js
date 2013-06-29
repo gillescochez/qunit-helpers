@@ -162,9 +162,8 @@ qh.staticMethod = function(method, object, len) {
 
     // TODO handle case where the constructor requires arguments
     var instance = new object();
-
-    equal(instance[method], undefined, this.getName(method, object) + qh.msg.isNotInherited);
     this.method(method, object, len);
+    equal(instance[method], undefined, this.getName(method, object) + qh.msg.isNotInherited);
 };
 
 /**
@@ -183,16 +182,5 @@ qh.globalMethod = function(method, len) {
  * @param [len]
  */
 qh.argsLength = function(item, name, len) {
-    equal(item.length, len, name + qh.msg.argumentsCount + len);
-};
-
-qh.property = function(property, object, type, value) {
-
-    var name = this.getName(property, object);
-    var item = this.getItem(property, object);
-
-    if (type) {
-
-    }
-
+    equal(item ? item.length : undefined, len, name + qh.msg.argumentsCount + len);
 };
